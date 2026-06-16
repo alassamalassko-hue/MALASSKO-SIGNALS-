@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0A0C12"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Malassko"/>
+<meta name="description" content="Malassko Signals — Signaux trading privés par Leader Malassko"/>
+<title>Malassko Signals</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "Malassko Signals",
+  short_name: "Malassko",
+  description: "Signaux trading privés par Leader Malassko",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#0A0C12",
+  theme_color: "#C9A84C",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23C9A84C'/%3E%3Ctext x='96' y='135' font-size='110' font-weight='900' text-anchor='middle' font-family='Arial' fill='%230A0C12'%3EM%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%23C9A84C'/%3E%3Ctext x='256' y='360' font-size='300' font-weight='900' text-anchor='middle' font-family='Arial' fill='%230A0C12'%3EM%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestUrl = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestUrl + '"/>');
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --gold:    #C9A84C;
+    --gold-hi: #E8C76A;
+    --green:   #3DDC97;
+    --red:     #F04B4B;
+    --amber:   #F0A04B;
+    --muted:   #8A94B2;
+    --base:    #0A0C12;
+    --card:    #111420;
+    --surface: #1A1F35;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bot: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--base);
+    font-family: 'Inter', sans-serif;
+    color: #E2E8F0;
+    overscroll-behavior: none;
+  }
+
+  /* ── LAYOUT ── */
+  #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+  /* ── HEADER ── */
+  #header {
+    background: var(--card);
+    border-bottom: 1px solid var(--surface);
+    padding: calc(12px + var(--safe-top)) 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .logo-mark {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900; font-size: 20px; color: #0A0C12;
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800; font-size: 14px; color: var(--gold-hi);
+    letter-spacing: 0.05em;
+  }
+  .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  #btn-new {
+    margin-left: auto;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #0A0C12; border: none; border-radius: 10px;
+    padding: 9px 14px; font-weight: 800; font-size: 13px;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── STATS BAR ── */
+  #stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; padding: 12px 14px;
+    background: var(--base); flex-shrink: 0;
+  }
+  .stat-card {
+    background: var(--card); border-radius: 10px;
+    padding: 10px 8px; text-align: center;
+    border: 1px solid var(--surface);
+  }
+  .stat-val { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; }
+  .stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+
+  /* ── FILTER BAR ── */
+  #filter-bar {
+    display: flex; gap: 6px; padding: 0 14px 10px;
+    overflow-x: auto; flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  #filter-bar::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--surface); border-radius: 20px;
+    padding: 6px 14px; font-size: 12px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .filter-btn.active {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold-hi);
+    border-color: rgba(201,168,76,0.5);
+  }
+
+  /* ── SEARCH ── */
+  #search-wrap { padding: 0 14px 10px; flex-shrink: 0; }
+  #search {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--surface); border-radius: 10px;
+    color: #E2E8F0; padding: 10px 14px; font-size: 14px;
+    outline: none; font-family: 'Inter', sans-serif;
+  }
+  #search::placeholder { color: var(--muted); }
+
+  /* ── SIGNAL LIST ── */
+  #signal-list {
+    flex: 1; overflow-y: auto; padding: 0 14px;
+    padding-bottom: calc(80px + var(--safe-bot));
+    -webkit-overflow-scrolling: touch;
+  }
+  #signal-list::-webkit-scrollbar { display: none; }
+
+  /* ── SIGNAL CARD ── */
+  .sig-card {
+    background: var(--card);
+    border: 1px solid var(--surface);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: transform 0.1s;
+  }
+  .sig-card:active { transform: scale(0.985); }
+  .sig-header {
+    padding: 14px 16px 10px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    cursor: pointer;
+  }
+  .sig-pair {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800; font-size: 18px; color: #E2E8F0;
+  }
+  .badge {
+    border-radius: 6px; padding: 3px 9px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+  }
+  .sig-meta {
+    padding: 0 16px 12px;
+    display: flex; gap: 14px; flex-wrap: wrap;
+    cursor: pointer;
+  }
+  .sig-meta span { font-size: 12px; color: var(--muted); }
+  .sig-meta b { font-weight: 700; }
+
+  /* Expanded detail */
+  .sig-detail {
+    border-top: 1px solid var(--surface);
+    padding: 14px 16px;
+    display: none;
+  }
+  .sig-detail.open { display: block; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .detail-box { background: var(--surface); border-radius: 10px; padding: 12px 14px; }
+  .detail-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .price-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+  .price-row .key { color: #4a5a6a; }
+  .note-box {
+    background: var(--surface); border-radius: 10px;
+    padding: 12px 14px; border-left: 3px solid var(--gold);
+    margin-bottom: 12px;
+  }
+  .note-text { color: #C5CBDF; font-size: 13px; line-height: 1.6; }
+
+  /* Action buttons */
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .act-btn {
+    border-radius: 9px; padding: 9px 14px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    border: 1.5px solid; flex: 1; min-width: 80px;
+    font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-edit   { background: rgba(201,168,76,0.12); color: var(--gold);  border-color: rgba(201,168,76,0.4); }
+  .btn-del    { background: rgba(240,75,75,0.10);  color: var(--red);   border-color: rgba(240,75,75,0.35); }
+  .btn-export { background: rgba(232,199,106,0.15); color: var(--gold-hi); border-color: var(--gold); flex: 2; }
+
+  /* ── EMPTY STATE ── */
+  #empty { text-align: center; padding: 60px 20px; display: none; }
+  #empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  #empty p { color: var(--muted); font-family: 'Space Grotesk', sans-serif; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    z-index: 100; display: none;
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    width: 100%; max-height: 92dvh;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 20px 18px calc(20px + var(--safe-bot));
+    border-top: 1px solid rgba(201,168,76,0.3);
+  }
+  .modal-handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: var(--surface); margin: 0 auto 16px;
+  }
+  .modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--gold-hi); font-size: 17px; font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .form-field input, .form-field select, .form-field textarea {
+    background: var(--surface); border: 1px solid #2A3050;
+    border-radius: 9px; color: #E2E8F0;
+    padding: 10px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
+    outline: none; width: 100%;
+    -webkit-appearance: none;
+  }
+  .form-field textarea { resize: none; min-height: 70px; }
+  select option { background: var(--card); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-cancel { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--surface); background: transparent; color: var(--muted); font-weight: 700; font-size: 14px; cursor: pointer; }
+  .btn-save   { flex: 2; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg, var(--gold), var(--amber)); color: #0A0C12; font-weight: 800; font-size: 14px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: calc(24px + var(--safe-bot)); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface); color: #E2E8F0;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 13px; font-weight: 600;
+    border: 1px solid var(--gold);
+    opacity: 0; transition: all 0.3s; z-index: 999;
+    white-space: nowrap; pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── IMAGE PREVIEW MODAL ── */
+  #img-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    padding: 20px;
+  }
+  #img-modal.open { display: flex; }
+  #img-modal canvas, #img-modal img { max-width: 100%; border-radius: 16px; }
+  #img-dl-btn {
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #0A0C12; border: none; border-radius: 12px;
+    padding: 14px 32px; font-weight: 800; font-size: 15px;
+    font-family: 'Space Grotesk', sans-serif; cursor: pointer;
+    width: 100%; max-width: 340px;
+  }
+  #img-close-btn {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--surface); border-radius: 12px;
+    padding: 12px 32px; font-weight: 700; font-size: 14px;
+    cursor: pointer; width: 100%; max-width: 340px;
+  }
+
+  /* ── INSTALL BANNER ── */
+  #install-banner {
+    display: none; position: fixed; bottom: calc(0px + var(--safe-bot));
+    left: 0; right: 0; background: var(--card);
+    border-top: 1px solid rgba(201,168,76,0.35);
+    padding: 14px 16px calc(14px + var(--safe-bot));
+    z-index: 80; gap: 12px; align-items: center;
+  }
+  #install-banner.show { display: flex; }
+  #install-banner p { flex: 1; font-size: 13px; color: #C5CBDF; line-height: 1.4; }
+  #btn-install {
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #0A0C12; border: none; border-radius: 9px;
+    padding: 10px 16px; font-weight: 800; font-size: 13px;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  #btn-install-dismiss {
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; flex-shrink: 0;
+    padding: 4px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="logo-mark">M</div>
+    <div>
+      <div class="brand-name">MALASSKO SIGNALS</div>
+      <div class="brand-sub">Trading · By Leader Malassko</div>
+    </div>
+    <button id="btn-new">+ Signal</button>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats">
+    <div class="stat-card"><div class="stat-val" id="stat-total" style="color:var(--gold)">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-actif" style="color:var(--green)">0</div><div class="stat-lbl">Actifs</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-long"  style="color:var(--green)">0</div><div class="stat-lbl">LONG</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-short" style="color:var(--red)">0</div><div class="stat-lbl">SHORT</div></div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div id="filter-bar">
+    <button class="filter-btn active" data-filter="TOUS">Tous</button>
+    <button class="filter-btn" data-filter="ACTIF">Actifs</button>
+    <button class="filter-btn" data-filter="ATTENTE">Attente</button>
+    <button class="filter-btn" data-filter="CLÔTURÉ">Clôturés</button>
+    <button class="filter-btn" data-filter="ANNULÉ">Annulés</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="search-wrap">
+    <input id="search" type="search" placeholder="🔍 Rechercher une paire..." autocomplete="off"/>
+  </div>
+
+  <!-- SIGNAL LIST -->
+  <div id="signal-list">
+    <div id="empty">
+      <div class="empty-icon">📭</div>
+      <p>Aucun signal trouvé</p>
+    </div>
+  </div>
+</div>
+
+<!-- FORM MODAL (bottom sheet) -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">➕ Nouveau Signal</div>
+    <input type="hidden" id="f-id"/>
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Paire</label>
+        <input id="f-pair" type="text" placeholder="ex: BTC/USDT"/>
+      </div>
+      <div class="form-field">
+        <label>Catégorie</label>
+        <select id="f-cat">
+          <option>Crypto</option><option>Forex</option>
+          <option>Indices</option><option>Matières premières</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Type</label>
+        <select id="f-type"><option>LONG</option><option>SHORT</option></select>
+      </div>
+      <div class="form-field">
+        <label>Statut</label>
+        <select id="f-status">
+          <option>ACTIF</option><option>ATTENTE</option>
+          <option>CLÔTURÉ</option><option>ANNULÉ</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Entrée ($)</label>
+        <input id="f-entry" type="number" placeholder="Prix d'entrée"/>
+      </div>
+      <div class="form-field">
+        <label>Stop Loss ($)</label>
+        <input id="f-sl" type="number" placeholder="Stop Loss"/>
+      </div>
+      <div class="form-field">
+        <label>TP 1 ($)</label>
+        <input id="f-tp1" type="number" placeholder="Take Profit 1"/>
+      </div>
+      <div class="form-field">
+        <label>TP 2 ($)</label>
+        <input id="f-tp2" type="number" placeholder="Take Profit 2"/>
+      </div>
+      <div class="form-field">
+        <label>TP 3 ($)</label>
+        <input id="f-tp3" type="number" placeholder="Take Profit 3"/>
+      </div>
+      <div class="form-field">
+        <label>Levier</label>
+        <select id="f-lev">
+          <option>Spot</option><option>2x</option><option>3x</option>
+          <option value="5x" selected>5x</option><option>10x</option><option>20x</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Timeframe</label>
+        <select id="f-tf">
+          <option>1M</option><option>5M</option><option>15M</option>
+          <option>1H</option><option value="4H" selected>4H</option>
+          <option>1D</option><option>1W</option>
+        </select>
+      </div>
+      <div class="form-field full">
+        <label>Analyse / Note</label>
+        <textarea id="f-note" placeholder="Votre analyse de marché..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-cancel">Annuler</button>
+      <button class="btn-save" id="modal-save">Publier le signal</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE PREVIEW MODAL -->
+<div id="img-modal">
+  <img id="img-preview" src="" alt="Signal"/>
+  <button id="img-dl-btn">⬇️ Enregistrer l'image</button>
+  <button id="img-close-btn">Fermer</button>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <p>📲 <strong>Installer Malassko Signals</strong> sur votre écran d'accueil</p>
+  <button id="btn-install">Installer</button>
+  <button id="btn-install-dismiss">✕</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA & STATE
+// ═══════════════════════════════════════════
+const C = {
+  gold:'#C9A84C', goldHi:'#E8C76A', green:'#3DDC97',
+  red:'#F04B4B', amber:'#F0A04B', muted:'#8A94B2',
+  base:'#0A0C12', card:'#111420', surface:'#1A1F35'
+};
+
+let signals = JSON.parse(localStorage.getItem('malassko_signals') || 'null') || [
+  { id:1, pair:"BTC/USDT", type:"LONG",  entry:"96500", tp1:"99000",  tp2:"102000", tp3:"108000", sl:"93200", leverage:"5x", timeframe:"4H", status:"ACTIF",   note:"Breakout structure haussière confirmée, OB 4H respecté.", date:"2026-06-16", category:"Crypto" },
+  { id:2, pair:"ETH/USDT", type:"LONG",  entry:"3450",  tp1:"3650",   tp2:"3900",   tp3:"4200",   sl:"3180",  leverage:"3x", timeframe:"1D", status:"ACTIF",   note:"Support majeur tenu, accumulation institutionnelle visible.", date:"2026-06-15", category:"Crypto" },
+  { id:3, pair:"SOL/USDT", type:"SHORT", entry:"172",   tp1:"162",    tp2:"150",    tp3:"140",    sl:"182",   leverage:"5x", timeframe:"4H", status:"CLÔTURÉ", note:"Rejet résistance, BOS bearish validé. TP1 & TP2 atteints ✅", date:"2026-06-13", category:"Crypto" },
+];
+
+let currentFilter = 'TOUS';
+let currentSearch  = '';
+let deferredPrompt = null;
+
+function save() { localStorage.setItem('malassko_signals', JSON.stringify(signals)); }
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const TYPE_COLOR   = { LONG: C.green, SHORT: C.red };
+const STATUS_COLOR = { ACTIF: C.green, CLÔTURÉ: C.muted, ANNULÉ: C.red, ATTENTE: C.amber };
+
+function badgeHTML(label, color) {
+  return `<span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}55">${label}</span>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function today() { return new Date().toISOString().slice(0,10); }
+
+function rrCalc(sig) {
+  if (!sig.entry || !sig.sl || !sig.tp3) return '—';
+  const rr = Math.abs(parseFloat(sig.tp3) - parseFloat(sig.entry)) /
+             Math.abs(parseFloat(sig.entry) - parseFloat(sig.sl));
+  return '1 : ' + rr.toFixed(1);
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function render() {
+  const list = document.getElementById('signal-list');
+  const empty = document.getElementById('empty');
+
+  const filtered = signals.filter(s => {
+    const mf = currentFilter === 'TOUS' || s.status === currentFilter;
+    const ms = s.pair.toLowerCase().includes(currentSearch.toLowerCase()) ||
+               s.category.toLowerCase().includes(currentSearch.toLowerCase());
+    return mf && ms;
+  });
+
+  // Stats
+  document.getElementById('stat-total').textContent = signals.length;
+  document.getElementById('stat-actif').textContent = signals.filter(s => s.status === 'ACTIF').length;
+  document.getElementById('stat-long').textContent  = signals.filter(s => s.type === 'LONG').length;
+  document.getElementById('stat-short').textContent = signals.filter(s => s.type === 'SHORT').length;
+
+  // Remove old cards (keep #empty)
+  list.querySelectorAll('.sig-card').forEach(el => el.remove());
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.forEach(sig => {
+    const tc = TYPE_COLOR[sig.type]   || C.muted;
+    const sc = STATUS_COLOR[sig.status] || C.muted;
+    const card = document.createElement('div');
+    card.className = 'sig-card';
+    card.dataset.id = sig.id;
+    card.style.borderLeft = `3px solid ${tc}`;
+    card.innerHTML = `
+      <div class="sig-header" data-toggle="${sig.id}">
+        <span class="sig-pair">${sig.pair}</span>
+        ${badgeHTML(sig.type, tc)}
+        ${badgeHTML(sig.status, sc)}
+        <span style="margin-left:auto;font-size:11px;color:${C.muted}">${sig.date} · ${sig.timeframe}</span>
+      </div>
+      <div class="sig-meta" data-toggle="${sig.id}">
+        <span>Entrée <b style="color:${C.gold}">$${sig.entry}</b></span>
+        <span>Levier <b>${sig.leverage}</b></span>
+        <span>SL <b style="color:${C.red}">$${sig.sl}</b></span>
+        <span style="color:${C.amber}">${sig.category}</span>
+      </div>
+      <div class="sig-detail" id="detail-${sig.id}">
+        <div class="detail-grid">
+          <div class="detail-box">
+            <div class="detail-lbl">Objectifs</div>
+            <div class="price-row"><span class="key">TP 1</span><span style="color:${C.green};font-weight:700">$${sig.tp1}</span></div>
+            <div class="price-row"><span class="key">TP 2</span><span style="color:${C.green};font-weight:700">$${sig.tp2}</span></div>
+            <div class="price-row"><span class="key">TP 3</span><span style="color:${C.green};font-weight:700">$${sig.tp3}</span></div>
+          </div>
+          <div class="detail-box">
+            <div class="detail-lbl">Risque</div>
+            <div class="price-row"><span class="key">Stop Loss</span><span style="color:${C.red};font-weight:700">$${sig.sl}</span></div>
+            <div class="price-row"><span class="key">Levier</span><span style="font-weight:700">${sig.leverage}</span></div>
+            <div class="price-row"><span class="key">R/R</span><span style="color:${C.gold};font-weight:700">${rrCalc(sig)}</span></div>
+          </div>
+        </div>
+        ${sig.note ? `<div class="note-box"><div class="detail-lbl">Analyse</div><div class="note-text">${sig.note}</div></div>` : ''}
+        <div class="action-row">
+          <button class="act-btn btn-edit"   data-edit="${sig.id}">✏️ Modifier</button>
+          <button class="act-btn btn-del"    data-del="${sig.id}">🗑</button>
+          <button class="act-btn btn-export" data-export="${sig.id}">📸 Télécharger</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  TOGGLE EXPAND
+// ═══════════════════════════════════════════
+document.getElementById('signal-list').addEventListener('click', e => {
+  const toggle = e.target.closest('[data-toggle]');
+  if (toggle) {
+    const id = toggle.dataset.toggle;
+    const det = document.getElementById('detail-' + id);
+    if (det) det.classList.toggle('open');
+    return;
+  }
+
+  // Edit
+  const editBtn = e.target.closest('[data-edit]');
+  if (editBtn) { openModal(parseInt(editBtn.dataset.edit)); return; }
+
+  // Delete
+  const delBtn = e.target.closest('[data-del]');
+  if (delBtn) {
+    if (confirm('Supprimer ce signal ?')) {
+      signals = signals.filter(s => s.id !== parseInt(delBtn.dataset.del));
+      save(); render();
+      showToast('Signal supprimé');
+    }
+    return;
+  }
+
+  // Export
+  const expBtn = e.target.closest('[data-export]');
+  if (expBtn) { exportSignal(parseInt(expBtn.dataset.export)); return; }
+});
+
+// ═══════════════════════════════════════════
+//  MODAL FORM
+// ═══════════════════════════════════════════
+function openModal(id) {
+  const sig = id ? signals.find(s => s.id === id) : null;
+  document.getElementById('modal-title').textContent = sig ? '✏️ Modifier le signal' : '➕ Nouveau Signal';
+  document.getElementById('modal-save').textContent  = sig ? 'Enregistrer' : 'Publier le signal';
+  document.getElementById('f-id').value      = sig ? sig.id : '';
+  document.getElementById('f-pair').value    = sig ? sig.pair     : '';
+  document.getElementById('f-cat').value     = sig ? sig.category : 'Crypto';
+  document.getElementById('f-type').value    = sig ? sig.type     : 'LONG';
+  document.getElementById('f-status').value  = sig ? sig.status   : 'ACTIF';
+  document.getElementById('f-entry').value   = sig ? sig.entry    : '';
+  document.getElementById('f-sl').value      = sig ? sig.sl       : '';
+  document.getElementById('f-tp1').value     = sig ? sig.tp1      : '';
+  document.getElementById('f-tp2').value     = sig ? sig.tp2      : '';
+  document.getElementById('f-tp3').value     = sig ? sig.tp3      : '';
+  document.getElementById('f-lev').value     = sig ? sig.leverage : '5x';
+  document.getElementById('f-tf').value      = sig ? sig.timeframe: '4H';
+  document.getElementById('f-note').value    = sig ? sig.note     : '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+document.getElementById('btn-new').addEventListener('click', () => openModal(null));
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+document.getElementById('modal-save').addEventListener('click', () => {
+  const pair = document.getElementById('f-pair').value.trim().toUpperCase();
+  if (!pair) { showToast('⚠️ Entrez une paire'); return; }
+  const id = document.getElementById('f-id').value;
+  const data = {
+    id:        id ? parseInt(id) : Date.now(),
+    pair,
+    category:  document.getElementById('f-cat').value,
+    type:      document.getElementById('f-type').value,
+    status:    document.getElementById('f-status').value,
+    entry:     document.getElementById('f-entry').value,
+    sl:        document.getElementById('f-sl').value,
+    tp1:       document.getElementById('f-tp1').value,
+    tp2:       document.getElementById('f-tp2').value,
+    tp3:       document.getElementById('f-tp3').value,
+    leverage:  document.getElementById('f-lev').value,
+    timeframe: document.getElementById('f-tf').value,
+    note:      document.getElementById('f-note').value,
+    date:      id ? signals.find(s => s.id === parseInt(id))?.date : today(),
+  };
+  if (id) {
+    signals = signals.map(s => s.id === parseInt(id) ? data : s);
+    showToast('✅ Signal modifié');
+  } else {
+    signals.unshift(data);
+    showToast('🚀 Signal publié !');
+  }
+  save(); render(); closeModal();
+});
+
+// ═══════════════════════════════════════════
+//  FILTERS
+// ═══════════════════════════════════════════
+document.getElementById('filter-bar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  render();
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  render();
+});
+
+// ═══════════════════════════════════════════
+//  EXPORT IMAGE (Canvas)
+// ═══════════════════════════════════════════
+function exportSignal(id) {
+  const sig = signals.find(s => s.id === id);
+  if (!sig) return;
+
+  const W = 900, PAD = 40;
+  const tc = TYPE_COLOR[sig.type]   || C.muted;
+  const sc = STATUS_COLOR[sig.status] || C.muted;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W;
+
+  // Calculate height dynamically
+  const noteLines = sig.note ? Math.ceil(sig.note.length / 55) : 0;
+  const noteH = sig.note ? (noteLines * 24 + 70) : 0;
+  canvas.height = 620 + noteH;
+  const H = canvas.height;
+
+  const ctx = canvas.getContext('2d');
+
+  // ── Background ──
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#0D1020');
+  bgGrad.addColorStop(1, '#111827');
+  ctx.fillStyle = bgGrad;
+  roundRect(ctx, 0, 0, W, H, 0);
+  ctx.fill();
+
+  // ── Top accent bar ──
+  const barGrad = ctx.createLinearGradient(0, 0, W, 0);
+  barGrad.addColorStop(0, tc);
+  barGrad.addColorStop(1, tc + '44');
+  ctx.fillStyle = barGrad;
+  ctx.fillRect(0, 0, W, 6);
+
+  // ── Header background ──
+  const hGrad = ctx.createLinearGradient(0, 6, 0, 90);
+  hGrad.addColorStop(0, '#161b30');
+  hGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = hGrad;
+  ctx.fillRect(0, 6, W, 84);
+
+  // ── Logo circle ──
+  const lGrad = ctx.createLinearGradient(PAD, 22, PAD+52, 74);
+  lGrad.addColorStop(0, C.gold); lGrad.addColorStop(1, C.amber);
+  ctx.fillStyle = lGrad;
+  roundRect(ctx, PAD, 22, 52, 52, 12);
+  ctx.fill();
+  ctx.fillStyle = '#0A0C12';
+  ctx.font = 'bold 30px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('M', PAD + 26, 56);
+
+  // ── Brand text ──
+  ctx.textAlign = 'left';
+  ctx.fillStyle = C.goldHi;
+  ctx.font = 'bold 18px Arial';
+  ctx.fillText('MALASSKO SIGNALS', PAD + 64, 46);
+  ctx.fillStyle = C.muted;
+  ctx.font = '12px Arial';
+  ctx.fillText('BY LEADER MALASSKO', PAD + 64, 66);
+
+  // ── Date ──
+  ctx.textAlign = 'right';
+  ctx.fillStyle = C.muted;
+  ctx.font = '13px Arial';
+  ctx.fillText(sig.date, W - PAD, 52);
+  ctx.textAlign = 'left';
+
+  // ── Divider ──
+  ctx.strokeStyle = '#1e2540';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, 90); ctx.lineTo(W, 90); ctx.stroke();
+
+  // ── Pair name ──
+  ctx.fillStyle = '#E2E8F0';
+  ctx.font = 'bold 44px Arial';
+  ctx.fillText(sig.pair, PAD, 150);
+
+  // ── Type badge ──
+  const typeLabel = sig.type + (sig.type === 'LONG' ? ' ▲' : ' ▼');
+  ctx.font = 'bold 15px Arial';
+  const typeW = ctx.measureText(typeLabel).width + 28;
+  ctx.fillStyle = tc + '28';
+  roundRect(ctx, PAD, 162, typeW, 32, 8);
+  ctx.fill();
+  ctx.strokeStyle = tc;
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, PAD, 162, typeW, 32, 8);
+  ctx.stroke();
+  ctx.fillStyle = tc;
+  ctx.fillText(typeLabel, PAD + 14, 183);
+
+  // ── Category badge ──
+  const catX = PAD + typeW + 12;
+  const catW = ctx.measureText(sig.category).width + 24;
+  ctx.fillStyle = C.amber + '20';
+  roundRect(ctx, catX, 162, catW, 32, 8);
+  ctx.fill();
+  ctx.strokeStyle = C.amber + '55';
+  ctx.lineWidth = 1;
+  roundRect(ctx, catX, 162, catW, 32, 8);
+  ctx.stroke();
+  ctx.fillStyle = C.amber;
+  ctx.fillText(sig.category, catX + 12, 183);
+
+  // ── Status badge (right) ──
+  const statW = ctx.measureText(sig.status).width + 24;
+  const statX = W - PAD - statW;
+  ctx.fillStyle = sc + '20';
+  roundRect(ctx, statX, 162, statW, 32, 8);
+  ctx.fill();
+  ctx.strokeStyle = sc + '55';
+  ctx.lineWidth = 1;
+  roundRect(ctx, statX, 162, statW, 32, 8);
+  ctx.stroke();
+  ctx.fillStyle = sc;
+  ctx.fillText(sig.status, statX + 12, 183);
+
+  // ── Price boxes ──
+  const bY = 215, bH = 200, bW = (W - PAD*2 - 16) / 2;
+  const b1X = PAD, b2X = PAD + bW + 16;
+
+  // Box 1: Entry + TPs
+  ctx.fillStyle = '#161b30';
+  roundRect(ctx, b1X, bY, bW, bH, 14); ctx.fill();
+  // Box 2: SL + params
+  ctx.fillStyle = '#161b30';
+  roundRect(ctx, b2X, bY, bW, bH, 14); ctx.fill();
+
+  function sectionLabel(x, y, text) {
+    ctx.fillStyle = C.muted;
+    ctx.font = '11px Arial';
+    ctx.fillText(text.toUpperCase(), x, y);
+  }
+  function bigPrice(x, y, val, color) {
+    ctx.fillStyle = color;
+    ctx.font = 'bold 32px Arial';
+    ctx.fillText(val, x, y);
+  }
+  function priceRow(x, y, key, val, valColor) {
+    ctx.fillStyle = '#4a5a6a';
+    ctx.font = '14px Arial';
+    ctx.fillText(key, x, y);
+    ctx.fillStyle = valColor || '#E2E8F0';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(val, b1X + bW - 18, y);
+    ctx.textAlign = 'left';
+  }
+  function priceRow2(x, y, key, val, valColor) {
+    ctx.fillStyle = '#4a5a6a';
+    ctx.font = '14px Arial';
+    ctx.fillText(key, x, y);
+    ctx.fillStyle = valColor || '#E2E8F0';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(val, b2X + bW - 18, y);
+    ctx.textAlign = 'left';
+  }
+
+  sectionLabel(b1X + 18, bY + 28, 'Entrée');
+  bigPrice(b1X + 18, bY + 68, '$' + sig.entry, C.goldHi);
+  ctx.strokeStyle = '#1e2540'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(b1X+18, bY+82); ctx.lineTo(b1X+bW-18, bY+82); ctx.stroke();
+  sectionLabel(b1X + 18, bY + 102, 'Objectifs');
+  priceRow(b1X+18, bY+128, 'TP 1', '$'+sig.tp1, C.green);
+  priceRow(b1X+18, bY+154, 'TP 2', '$'+sig.tp2, C.green);
+  priceRow(b1X+18, bY+180, 'TP 3', '$'+sig.tp3, C.green);
+
+  sectionLabel(b2X + 18, bY + 28, 'Stop Loss');
+  bigPrice(b2X + 18, bY + 68, '$' + sig.sl, C.red);
+  ctx.strokeStyle = '#1e2540'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(b2X+18, bY+82); ctx.lineTo(b2X+bW-18, bY+82); ctx.stroke();
+  sectionLabel(b2X + 18, bY + 102, 'Paramètres');
+  priceRow2(b2X+18, bY+128, 'Levier', sig.leverage);
+  priceRow2(b2X+18, bY+154, 'Timeframe', sig.timeframe);
+  priceRow2(b2X+18, bY+180, 'R/R', rrCalc(sig), C.gold);
+
+  let curY = bY + bH + 20;
+
+  // ── Note box ──
+  if (sig.note) {
+    ctx.fillStyle = '#161b30';
+    roundRect(ctx, PAD, curY, W - PAD*2, noteH, 12); ctx.fill();
+    ctx.fillStyle = C.gold;
+    ctx.fillRect(PAD, curY, 3, noteH);
+    sectionLabel(PAD + 18, curY + 26, 'Analyse');
+    ctx.fillStyle = '#C5CBDF';
+    ctx.font = '15px Arial';
+    wrapText(ctx, sig.note, PAD + 18, curY + 52, W - PAD*2 - 36, 24);
+    curY += noteH + 16;
+  }
+
+  // ── R/R bar ──
+  sectionLabel(PAD, curY + 16, 'Risque → Récompense');
+  ctx.textAlign = 'right';
+  ctx.fillStyle = C.gold;
+  ctx.font = 'bold 12px Arial';
+  ctx.fillText(rrCalc(sig), W - PAD, curY + 16);
+  ctx.textAlign = 'left';
+
+  ctx.fillStyle = '#1e2540';
+  roundRect(ctx, PAD, curY + 22, W - PAD*2, 6, 3); ctx.fill();
+  ctx.fillStyle = C.red + '88';
+  roundRect(ctx, PAD, curY + 22, (W - PAD*2) * 0.22, 6, 3); ctx.fill();
+  const barGrad2 = ctx.createLinearGradient(PAD + (W-PAD*2)*0.22, 0, W-PAD, 0);
+  barGrad2.addColorStop(0, C.green + '66'); barGrad2.addColorStop(1, C.green);
+  ctx.fillStyle = barGrad2;
+  roundRect(ctx, PAD + (W-PAD*2)*0.22, curY + 22, (W-PAD*2)*0.78, 6, 3); ctx.fill();
+
+  curY += 46;
+
+  // ── Footer ──
+  ctx.strokeStyle = '#1e2540'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, curY); ctx.lineTo(W, curY); ctx.stroke();
+  ctx.fillStyle = '#2a3250';
+  ctx.font = '12px Arial';
+  ctx.fillText('MALASSKO SIGNALS · NFA · DYOR', PAD, curY + 28);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = C.gold + '80';
+  ctx.fillText('⚡ Signal #' + sig.id, W - PAD, curY + 28);
+  ctx.textAlign = 'left';
+
+  // ── Show preview & download ──
+  const dataUrl = canvas.toDataURL('image/png');
+  const preview = document.getElementById('img-preview');
+  preview.src = dataUrl;
+  document.getElementById('img-modal').classList.add('open');
+
+  document.getElementById('img-dl-btn').onclick = () => {
+    const a = document.createElement('a');
+    a.download = `signal_${sig.pair.replace('/','_')}_${sig.date}.png`;
+    a.href = dataUrl;
+    a.click();
+    showToast('📸 Image téléchargée !');
+  };
+}
+
+// ── Canvas helpers ──
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  const words = text.split(' ');
+  let line = '';
+  for (let n = 0; n < words.length; n++) {
+    const test = line + words[n] + ' ';
+    if (ctx.measureText(test).width > maxW && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineH;
+    } else { line = test; }
+  }
+  ctx.fillText(line, x, y);
+}
+
+// ── Image modal close ──
+document.getElementById('img-close-btn').addEventListener('click', () => {
+  document.getElementById('img-modal').classList.remove('open');
+});
+document.getElementById('img-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('img-modal'))
+    document.getElementById('img-modal').classList.remove('open');
+});
+
+// ═══════════════════════════════════════════
+//  PWA INSTALL
+// ═══════════════════════════════════════════
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+
+document.getElementById('btn-install').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') showToast('✅ App installée avec succès !');
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+document.getElementById('btn-install-dismiss').addEventListener('click', () => {
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+window.addEventListener('appinstalled', () => showToast('🎉 Malassko Signals installé !'));
+
+// ═══════════════════════════════════════════
+//  SERVICE WORKER (offline support)
+// ═══════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'malassko-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl  = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
